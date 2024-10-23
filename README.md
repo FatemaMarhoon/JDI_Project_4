@@ -78,6 +78,3 @@ The backend will be structured in compliance with the **MVC** architecture, ensu
    docker-compose up
    ```
 
----
-
-Now, you can modify and elaborate on this depending on how your project evolves. Let’s also work on your ERD. You can describe your entities like **User**, **Opportunity**, **Application**, and their relationships (one-to-many, many-to-many, etc.).
