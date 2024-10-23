@@ -52,8 +52,8 @@ The backend will be structured in compliance with the **MVC** architecture, ensu
 3. **As an admin**, I want to manage users, opportunities, and ensure the integrity of the platform.
 
 ## Entity-Relationship Diagram (ERD)
+![Untitled-4](https://github.com/user-attachments/assets/46570a0a-2c27-4df5-91b3-20bd045864f1)
 
-(Attach your ERD diagram here, outlining the relationships between users, opportunities, roles, applications, etc.)
 
 ## Installation Instructions
 
