@@ -27,8 +27,6 @@ The **Volunteer Matching Platform** is a web-based system that connects voluntee
 
 - **Search and Filtering**: Volunteers can search for opportunities by location, skill requirement, or cause.
   
-- **Third-party Integration**: Integrate with third-party APIs to fetch events from external sources like non-profits or volunteer databases (as a bonus feature).
-
 ## Tools and Technologies
 
 - **Java 17**
