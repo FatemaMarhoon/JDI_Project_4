@@ -1,6 +1,3 @@
-Great choice with the "Volunteer Matching Platform"! Here's a tailored README.md draft to get you started:
-
----
 
 # Volunteer Matching Platform
 
