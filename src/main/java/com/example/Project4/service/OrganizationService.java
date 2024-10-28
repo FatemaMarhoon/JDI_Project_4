@@ -42,12 +42,16 @@ public class OrganizationService {
         // Check if the user is an admin
         if (!isAdmin()) {
             errors.add("Only admins can approve organizations");
+            returnDao.setErrors(errors); // Return immediately with the error
+            return returnDao;
         }
 
         // Find the organization by ID
         Optional<Organization> optionalOrganization = organizationRepository.findById(organizationId);
         if (optionalOrganization.isEmpty()) {
             errors.add("Organization not found");
+            returnDao.setErrors(errors);
+            return returnDao; // Return immediately if organization is not found
         } else {
             Organization organization = optionalOrganization.get();
 
@@ -71,6 +75,7 @@ public class OrganizationService {
 
         return returnDao;
     }
+
 
 
     // Reject organization
