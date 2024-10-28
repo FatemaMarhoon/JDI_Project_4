@@ -27,7 +27,7 @@ public class OrganizationController {
     }
 
     // Get all approved organizations
-    @GetMapping
+    @GetMapping("/approved") // For getting only approved organizations
     public ResponseEntity<List<Organization>> getAllApprovedOrganizations() {
         List<Organization> organizations = organizationService.getAllApprovedOrganizations();
         return ResponseEntity.ok(organizations);
