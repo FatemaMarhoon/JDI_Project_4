@@ -417,4 +417,22 @@ public class UserService {
         return true;
     }
 
+
+    /**
+     * Retrieves the role of the currently logged-in user.
+     *
+     * @return the role of the currently logged-in user, or null if no user is authenticated.
+     */
+    public Role getCurrentUserRole() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.getPrincipal() instanceof MyUserDetails) {
+            MyUserDetails userDetails = (MyUserDetails) authentication.getPrincipal();
+            User currentUser = userDetails.getUser();
+            return currentUser.getRole();
+        }
+
+        return null; // No user is authenticated
+    }
+
 }
