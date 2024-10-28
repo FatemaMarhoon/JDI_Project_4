@@ -19,11 +19,32 @@ public class OrganizationController {
         this.organizationService = organizationService;
     }
 
-    // Create a new organization
+    // Create a new organization (default to PENDING)
     @PostMapping
     public ResponseEntity<Organization> createOrganization(@RequestBody Organization organization) {
         Organization createdOrganization = organizationService.createOrganization(organization);
         return ResponseEntity.ok(createdOrganization);
+    }
+
+    // Get all approved organizations
+    @GetMapping
+    public ResponseEntity<List<Organization>> getAllApprovedOrganizations() {
+        List<Organization> organizations = organizationService.getAllApprovedOrganizations();
+        return ResponseEntity.ok(organizations);
+    }
+
+    // Approve organization (Admin only)
+    @PutMapping("/{id}/approve")
+    public ResponseEntity<Organization> approveOrganization(@PathVariable("id") Integer organizationId) {
+        Organization approvedOrganization = organizationService.approveOrganization(organizationId);
+        return ResponseEntity.ok(approvedOrganization);
+    }
+
+    // Reject organization (Admin only)
+    @PutMapping("/{id}/reject")
+    public ResponseEntity<Organization> rejectOrganization(@PathVariable("id") Integer organizationId) {
+        Organization rejectedOrganization = organizationService.rejectOrganization(organizationId);
+        return ResponseEntity.ok(rejectedOrganization);
     }
 
     // Get all organizations
