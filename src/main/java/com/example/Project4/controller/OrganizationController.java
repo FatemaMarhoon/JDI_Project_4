@@ -1,5 +1,6 @@
 package com.example.Project4.controller;
 
+import com.example.Project4.dao.GenericDao;
 import com.example.Project4.model.Organization;
 import com.example.Project4.service.OrganizationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +22,12 @@ public class OrganizationController {
 
     // Create a new organization (default to PENDING)
     @PostMapping
-    public ResponseEntity<Organization> createOrganization(@RequestBody Organization organization) {
-        Organization createdOrganization = organizationService.createOrganization(organization);
-        return ResponseEntity.ok(createdOrganization);
+    public ResponseEntity<GenericDao<Organization>> createOrganization(@RequestBody Organization organization) {
+        GenericDao<Organization> returnDao = organizationService.createOrganization(organization);
+        if (!returnDao.getErrors().isEmpty()) {
+            return ResponseEntity.badRequest().body(returnDao); // Return errors if present
+        }
+        return ResponseEntity.ok(returnDao); // Return created organization
     }
 
     // Get all approved organizations
@@ -35,16 +39,22 @@ public class OrganizationController {
 
     // Approve organization (Admin only)
     @PutMapping("/{id}/approve")
-    public ResponseEntity<Organization> approveOrganization(@PathVariable("id") Integer organizationId) {
-        Organization approvedOrganization = organizationService.approveOrganization(organizationId);
-        return ResponseEntity.ok(approvedOrganization);
+    public ResponseEntity<GenericDao<Organization>> approveOrganization(@PathVariable("id") Integer organizationId) {
+        GenericDao<Organization> returnDao = organizationService.approveOrganization(organizationId);
+        if (!returnDao.getErrors().isEmpty()) {
+            return ResponseEntity.badRequest().body(returnDao); // Return errors if present
+        }
+        return ResponseEntity.ok(returnDao); // Return approved organization
     }
 
     // Reject organization (Admin only)
     @PutMapping("/{id}/reject")
-    public ResponseEntity<Organization> rejectOrganization(@PathVariable("id") Integer organizationId) {
-        Organization rejectedOrganization = organizationService.rejectOrganization(organizationId);
-        return ResponseEntity.ok(rejectedOrganization);
+    public ResponseEntity<GenericDao<Organization>> rejectOrganization(@PathVariable("id") Integer organizationId) {
+        GenericDao<Organization> returnDao = organizationService.rejectOrganization(organizationId);
+        if (!returnDao.getErrors().isEmpty()) {
+            return ResponseEntity.badRequest().body(returnDao); // Return errors if present
+        }
+        return ResponseEntity.ok(returnDao); // Return rejected organization
     }
 
     // Get all organizations
@@ -56,25 +66,33 @@ public class OrganizationController {
 
     // Get an organization by ID
     @GetMapping("/{id}")
-    public ResponseEntity<Organization> getOrganizationById(@PathVariable("id") Integer organizationId) {
-        return organizationService.getOrganizationById(organizationId)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<GenericDao<Organization>> getOrganizationById(@PathVariable("id") Integer organizationId) {
+        GenericDao<Organization> returnDao = organizationService.getOrganizationById(organizationId);
+        if (!returnDao.getErrors().isEmpty()) {
+            return ResponseEntity.badRequest().body(returnDao); // Return errors if present
+        }
+        return ResponseEntity.ok(returnDao); // Return organization found
     }
 
     // Update an organization
     @PutMapping("/{id}")
-    public ResponseEntity<Organization> updateOrganization(
+    public ResponseEntity<GenericDao<Organization>> updateOrganization(
             @PathVariable("id") Integer organizationId,
             @RequestBody Organization organizationDetails) {
-        Organization updatedOrganization = organizationService.updateOrganization(organizationId, organizationDetails);
-        return ResponseEntity.ok(updatedOrganization);
+        GenericDao<Organization> returnDao = organizationService.updateOrganization(organizationId, organizationDetails);
+        if (!returnDao.getErrors().isEmpty()) {
+            return ResponseEntity.badRequest().body(returnDao); // Return errors if present
+        }
+        return ResponseEntity.ok(returnDao); // Return updated organization
     }
 
     // Delete an organization
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteOrganization(@PathVariable("id") Integer organizationId) {
-        organizationService.deleteOrganization(organizationId);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<GenericDao<Void>> deleteOrganization(@PathVariable("id") Integer organizationId) {
+        GenericDao<Void> returnDao = organizationService.deleteOrganization(organizationId);
+        if (!returnDao.getErrors().isEmpty()) {
+            return ResponseEntity.badRequest().body(returnDao); // Return errors if present
+        }
+        return ResponseEntity.noContent().build(); // No content to return on successful deletion
     }
 }
