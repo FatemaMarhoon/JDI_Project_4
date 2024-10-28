@@ -1,11 +1,10 @@
-package com.example.Project4.controller;
+package com.example.Project4.service;
 
 import com.example.Project4.model.VolunteerTracking;
 import com.example.Project4.model.User;
 import com.example.Project4.repository.VolunteerTrackingRepository;
 import com.example.Project4.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
