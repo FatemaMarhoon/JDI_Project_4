@@ -1,6 +1,7 @@
 package com.example.Project4.model;
 
 
+import com.example.Project4.enums.Status;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -20,4 +21,6 @@ public class Organization {
     private String contactInfo;
     private String description;
 
+    @Enumerated(EnumType.STRING)
+    private Status status = Status.PENDING;
 }
