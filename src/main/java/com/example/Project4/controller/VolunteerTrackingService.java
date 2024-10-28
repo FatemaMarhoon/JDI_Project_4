@@ -28,5 +28,11 @@ public class VolunteerTrackingService {
         return trackingRepository.findByVolunteer(volunteer);
     }
 
+    // Record volunteer participation
+    public VolunteerTracking recordParticipation(VolunteerTracking tracking) {
+        return trackingRepository.save(tracking);
+    }
+
+
 
 }
