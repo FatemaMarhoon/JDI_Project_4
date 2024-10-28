@@ -1,5 +1,6 @@
 package com.example.Project4.model;
 
+import com.example.Project4.enums.Status;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -26,7 +27,8 @@ public class Application {
     @JoinColumn(name = "opportunityId", nullable = false)
     private VolunteerOpportunity opportunity;
 
-    private String status; // e.g., pending, accepted, rejected
+    @Enumerated(EnumType.STRING)
+    private Status status = Status.PENDING;
 
     @Column(name = "applied_at")
     private LocalDateTime appliedAt;
