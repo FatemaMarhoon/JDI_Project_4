@@ -66,7 +66,14 @@ public class User {
 
 
 
+    private boolean isVolunteer;
 
+    private boolean isOrganization;
+
+
+    @OneToOne(mappedBy = "user")
+    @JsonIgnore
+    private Organization organization;
 
     public User(UserDto dto) {
         this.id = dto.getId();
