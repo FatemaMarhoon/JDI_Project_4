@@ -3,6 +3,7 @@ package com.example.Project4.service;
 import com.example.Project4.dao.GenericDao;
 import com.example.Project4.enums.Status;
 import com.example.Project4.model.Application;
+import com.example.Project4.model.Role;
 import com.example.Project4.model.User;
 import com.example.Project4.model.VolunteerOpportunity;
 import com.example.Project4.repository.ApplicationRepository;
@@ -18,15 +19,17 @@ import java.util.Optional;
 
 @Service
 public class ApplicationService {
+    private final UserService userService; // Declare UserService
 
     private final ApplicationRepository applicationRepository;
     private  final UserRepository userRepository;
     private final VolunteerOpportunityRepository volunteerOpportunityRepository;
     @Autowired
-    public ApplicationService(ApplicationRepository applicationRepository, UserRepository userRepository, VolunteerOpportunityRepository volunteerOpportunityRepository) {
+    public ApplicationService(ApplicationRepository applicationRepository, UserRepository userRepository, VolunteerOpportunityRepository volunteerOpportunityRepository,UserService userService) {
         this.applicationRepository = applicationRepository;
         this.userRepository=userRepository;
         this.volunteerOpportunityRepository=volunteerOpportunityRepository;
+        this.userService=userService;
     }
 
 
@@ -191,5 +194,9 @@ public class ApplicationService {
         }
 
         return returnDao;
+    }
+    private boolean isVolunteer() {
+        Role currentRole = userService.getCurrentUserRole();
+        return currentRole != null && currentRole.getName().equals("Volunteer"); // Adjust based on your Role enum
     }
 }
