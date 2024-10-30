@@ -24,6 +24,9 @@ public class RoleDto implements Serializable {
     private String name;
     private String description;
     private List<UserDto> users;
+    public RoleDto(Long id) {
+        this.id = id;
+    }
 
     public RoleDto(Role role, boolean details) {
         this.id = role.getId();
