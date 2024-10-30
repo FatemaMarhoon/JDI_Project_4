@@ -36,7 +36,9 @@ public class UserDto implements Serializable {
     private LocalDateTime tokenExpirationTime;
     private RoleDto role;
     private ProfileDto profile;
-
+    private OrganizationDto organizationDto;
+    private boolean isOrganization;
+    private boolean isVolunteer;
 
     public UserDto(User user, boolean details) {
         this.id = user.getId();
