@@ -23,4 +23,11 @@ public class Organization {
 
     @Enumerated(EnumType.STRING)
     private Status status = Status.PENDING;
+
+
+
+    @OneToOne
+    @JoinColumn(name = "userId")
+
+    private User user;
 }
