@@ -172,18 +172,24 @@ public class UserService {
             errors.add("Last Name cannot be empty");
         }
 
-        // Validate Role
-        Optional<Role> role = Optional.empty();
+        // Set default role based on user type if role is null
         if (dto.getRole() == null || dto.getRole().getId() == null) {
-            errors.add("Role cannot be empty");
-        } else {
-            role = roleRepository.findById(dto.getRole().getId());
-            if (role.isEmpty()) {
-                errors.add("Role does not exist");
+            if (dto.isOrganization()) {
+                dto.setRole(new RoleDto(3L));  // Default to 'Organization' role ID
+            } else if (dto.isVolunteer()) {
+                dto.setRole(new RoleDto(2L));  // Default to 'Volunteer' role ID
+            } else {
+                dto.setRole(new RoleDto(1L));  // Default to 'Admin' role ID
             }
         }
 
-        // Validate Organization Details
+        // Validate if the provided role exists in the database
+        Optional<Role> role = roleRepository.findById(dto.getRole().getId());
+        if (role.isEmpty()) {
+            errors.add("Role does not exist");
+        }
+
+        // Validate Organization Details if the user is an organization
         if (dto.isOrganization()) {
             if (dto.getOrganizationDto() == null) {
                 errors.add("Organization details must be provided when isOrganization is true.");
@@ -211,7 +217,7 @@ public class UserService {
                 // Encode password and set UserDto fields
                 dto.setPassword(passwordEncoder.encode(dto.getPassword()));
                 dto.setProfile(new ProfileDto(profile, false));
-                dto.setRole(new RoleDto(role.get(), false));
+                dto.setRole(new RoleDto(role.get(), false));  // Set full Role object after validating
                 String randomCode = RandomString.make(64);
                 dto.setVerificationCode(randomCode);
                 dto.setEnabled(false);
@@ -224,7 +230,7 @@ public class UserService {
                 user.setVolunteer(dto.isVolunteer());
                 User savedUser = userRepository.save(user);
 
-                // Create and save the Organization entity
+                // Create and save the Organization entity if necessary
                 if (dto.isOrganization() && dto.getOrganizationDto() != null) {
                     Organization organization = new Organization();
                     organization.setName(dto.getOrganizationDto().getName());
@@ -252,6 +258,7 @@ public class UserService {
 
         return returnDao;
     }
+
 
 
     /**
