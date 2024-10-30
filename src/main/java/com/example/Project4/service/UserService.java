@@ -5,7 +5,9 @@ package com.example.Project4.service;
 import com.example.Project4.dto.ProfileDto;
 import com.example.Project4.dto.RoleDto;
 import com.example.Project4.dto.UserDto;
+import com.example.Project4.enums.Status;
 import com.example.Project4.model.*;
+import com.example.Project4.repository.OrganizationRepository;
 import com.example.Project4.repository.ProfileRepository;
 import com.example.Project4.repository.RoleRepository;
 import com.example.Project4.repository.UserRepository;
@@ -46,7 +48,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final ProfileRepository profileRepository;
     private final RoleRepository roleRepository;
-//    private final EmployeeRepository employeeRepository;
+   private final OrganizationRepository organizationRepository ;
     private final PasswordEncoder passwordEncoder;
     private final JWTUtils jwTutils;
     private final AuthenticationManager authenticationManager;
@@ -57,12 +59,15 @@ public class UserService {
     public UserService(UserRepository userRepository,
                        ProfileRepository profileRepository,
                        RoleRepository roleRepository,
+                       OrganizationRepository organizationRepository,
+
                        @Lazy PasswordEncoder passwordEncoder,
                        JWTUtils jwTutils,
                        @Lazy AuthenticationManager authenticationManager,
                        @Lazy MyUserDetails myUserDetails,
                        JavaMailSender mailSender) {
         this.userRepository = userRepository;
+        this.organizationRepository=organizationRepository;
         this.profileRepository = profileRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
@@ -120,11 +125,17 @@ public class UserService {
      * @throws UnsupportedEncodingException if an encoding error occurs
      */
     public GenericDao<UserDto> createUser(UserDto dto) throws MessagingException, UnsupportedEncodingException {
-
-
         GenericDao<UserDto> returnDao = new GenericDao<>();
         List<String> errors = new ArrayList<>();
 
+        // Log received UserDto
+        if (dto.getOrganizationDto() != null) {
+            System.out.println("Received UserDto: " + dto.getOrganizationDto().getName());
+        } else {
+            System.out.println("No organization data provided.");
+        }
+
+        // Validate Email
         if (dto.getEmail() == null || dto.getEmail().isBlank()) {
             errors.add("Email cannot be empty");
         }
@@ -150,44 +161,81 @@ public class UserService {
                 errors.add("Password must contain at least one special character (e.g., @, #, $, etc.)");
             }
         }
+
+        // Validate First Name
         if (dto.getFirstName() == null || dto.getFirstName().isBlank()) {
-            errors.add("First cannot be empty");
+            errors.add("First Name cannot be empty");
         }
+
+        // Validate Last Name
         if (dto.getLastName() == null || dto.getLastName().isBlank()) {
             errors.add("Last Name cannot be empty");
         }
 
+        // Validate Role
         Optional<Role> role = Optional.empty();
-        if (dto.getRole().getId() == null) {
+        if (dto.getRole() == null || dto.getRole().getId() == null) {
             errors.add("Role cannot be empty");
         } else {
             role = roleRepository.findById(dto.getRole().getId());
-
             if (role.isEmpty()) {
                 errors.add("Role does not exist");
             }
         }
 
+        // Validate Organization Details
+        if (dto.isOrganization()) {
+            if (dto.getOrganizationDto() == null) {
+                errors.add("Organization details must be provided when isOrganization is true.");
+            } else {
+                if (dto.getOrganizationDto().getName() == null || dto.getOrganizationDto().getName().isBlank()) {
+                    errors.add("Organization name cannot be empty.");
+                }
+                // Add other organization validations as necessary
+            }
+        }
+
+        // Proceed with user creation if there are no errors
         if (errors.isEmpty()) {
             Optional<User> retrievedUser = userRepository.findUserByEmail(dto.getEmail());
-
             if (retrievedUser.isEmpty()) {
                 dto.setStatus(true);
+
+                // Save user profile
                 UserProfile profile = new UserProfile();
                 profile.setFirstName(dto.getFirstName());
                 profile.setLastName(dto.getLastName());
                 profile.setProfilePic("");
                 profile = profileRepository.save(profile);  // Save profile first to avoid detached entity issue
+
+                // Encode password and set UserDto fields
                 dto.setPassword(passwordEncoder.encode(dto.getPassword()));
                 dto.setProfile(new ProfileDto(profile, false));
                 dto.setRole(new RoleDto(role.get(), false));
                 String randomCode = RandomString.make(64);
                 dto.setVerificationCode(randomCode);
                 dto.setEnabled(false);
+
+                // Create User and save
                 User user = new User(dto);
-                user.setProfile(profile);  // Attach the managed profile entity
-                user.setRole(role.get());  // Attach the managed role entity
+                user.setProfile(profile);  // Link profile to user
+                user.setRole(role.get());  // Link role to user
+                user.setOrganization(dto.isOrganization());
+                user.setVolunteer(dto.isVolunteer());
                 User savedUser = userRepository.save(user);
+
+                // Create and save the Organization entity
+                if (dto.isOrganization() && dto.getOrganizationDto() != null) {
+                    Organization organization = new Organization();
+                    organization.setName(dto.getOrganizationDto().getName());
+                    organization.setContactInfo(dto.getOrganizationDto().getContactInfo());
+                    organization.setDescription(dto.getOrganizationDto().getDescription());
+                    organization.setUser(savedUser); // Link organization to user
+                    organization.setStatus(Status.PENDING);
+
+                    organizationRepository.save(organization); // Save organization
+                    System.out.println("Organization created: " + dto.getOrganizationDto().getName());
+                }
 
                 returnDao.setObject(new UserDto(savedUser, false));
                 sendVerificationEmail(savedUser);
@@ -195,11 +243,16 @@ public class UserService {
                 errors.add("User already exists");
             }
         }
+
+        // Handle errors if any
         if (!errors.isEmpty()) {
+            System.out.println("Errors: " + errors);
             returnDao.setErrors(errors);
         }
+
         return returnDao;
     }
+
 
     /**
      * Edits an existing user with the provided UserDto.
