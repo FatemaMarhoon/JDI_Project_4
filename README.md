@@ -73,8 +73,36 @@ The backend will be structured in compliance with the **MVC** architecture, ensu
    ```bash
    mvn spring-boot:run
    ```
-5. Docker:
-   ```bash
-   docker-compose up
-   ```
+
+
+## Running Spring Boot Application and PostgreSQL Database Using Docker Compose
+
+Now we have our docker compose setup for this application. So first create a jar build for this application using following command,
+
+Navigate to application root folder and execute,
+
+```
+ mvn package -Dmaven.test.skip=true
+```
+
+Or 
+
+```
+ mvn package -DskipTests=true
+```
+Now there should be a newly created jar file with all the necessary files to run this application on  **build/libs**  folder.
+
+Then create the build with docker compose to build docker image using built jar file.
+
+```
+ docker-compose build
+```
+
+Then use following command to run whole setup using docker compose.
+
+```
+ docker-compose up
+```
+
+Then It will capture the docker-compose.yml and start running using the instructions given on that file.
 
