@@ -14,8 +14,16 @@ import java.util.Optional;
 @Service
 public class FollowService {
 
+    private final FollowRepository followRepository;
+    private final UserService userService;
+
+    public FollowService(FollowRepository followRepository, UserService userService) {
+        this.followRepository = followRepository;
+        this.userService = userService;
+    }
+
     @Autowired
-    private FollowRepository followRepository;
+
 
     public List<Follow> getAllFollows() {
         return followRepository.findAll();
@@ -39,10 +47,12 @@ public class FollowService {
         if (exists) {
             throw new RuntimeException("User is already following this organization.");
         }
-
+        follow.setFollower(userService.getCurrentUser());
         follow.setFollowedAt(LocalDateTime.now());
         return followRepository.save(follow);
     }
+
+
 
     public void deleteFollow(Integer id) {
         Follow follow = followRepository.findById(id)
