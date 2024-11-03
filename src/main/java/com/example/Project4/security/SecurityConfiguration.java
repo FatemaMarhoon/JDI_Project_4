@@ -68,7 +68,9 @@ public class SecurityConfiguration {
                         "/api-docs**",
                         "/api-docs/**",
                         "files/**",
-                        "/api/organizations/approved"
+                        "/api/organizations/approved",
+                        "/api/opportunities",
+                        "/api/opportunities/search"
                 )
                 .permitAll()
                 .anyRequest().authenticated();
