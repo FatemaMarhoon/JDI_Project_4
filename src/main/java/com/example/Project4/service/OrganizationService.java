@@ -2,6 +2,7 @@ package com.example.Project4.service;
 
 import com.example.Project4.dao.GenericDao;
 import com.example.Project4.model.Organization;
+import com.example.Project4.model.VolunteerOpportunity;
 import com.example.Project4.repository.OrganizationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -186,5 +187,9 @@ public class OrganizationService {
     private boolean isAdmin() {
         Role currentRole = userService.getCurrentUserRole();
         return currentRole != null && currentRole.getName().equals("Admin"); // Adjust based on your Role enum
+    }
+
+    public List<Organization> searchOrgByName(String name) {
+        return organizationRepository.findByNameContainingIgnoreCase(name);
     }
 }

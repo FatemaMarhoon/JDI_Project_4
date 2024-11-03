@@ -2,6 +2,7 @@ package com.example.Project4.controller;
 
 import com.example.Project4.dao.GenericDao;
 import com.example.Project4.model.Organization;
+import com.example.Project4.model.VolunteerOpportunity;
 import com.example.Project4.service.OrganizationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -94,5 +95,10 @@ public class OrganizationController {
             return ResponseEntity.badRequest().body(returnDao); // Return errors if present
         }
         return ResponseEntity.noContent().build(); // No content to return on successful deletion
+    }
+
+    @GetMapping("/search")
+    public List<Organization> searchOrg(@RequestParam String name) {
+        return organizationService.searchOrgByName(name);
     }
 }
