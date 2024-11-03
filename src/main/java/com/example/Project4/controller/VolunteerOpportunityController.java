@@ -60,4 +60,15 @@ public class VolunteerOpportunityController {
     public List<VolunteerOpportunity> searchOpportunities(@RequestParam String title) {
         return volunteerOpportunityService.searchOpportunitiesByTitle(title);
     }
+
+    @PutMapping("/{id}/archive")
+    public ResponseEntity<VolunteerOpportunity> archiveOpportunity(@PathVariable Long id) {
+        try {
+            VolunteerOpportunity archivedOpportunity = volunteerOpportunityService.archiveOpportunity(id);
+            return ResponseEntity.ok(archivedOpportunity);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 }
