@@ -2,10 +2,7 @@ package com.example.Project4.service;
 
 import com.example.Project4.dao.GenericDao;
 import com.example.Project4.enums.Status;
-import com.example.Project4.model.Application;
-import com.example.Project4.model.Role;
-import com.example.Project4.model.User;
-import com.example.Project4.model.VolunteerOpportunity;
+import com.example.Project4.model.*;
 import com.example.Project4.repository.ApplicationRepository;
 import com.example.Project4.repository.UserRepository;
 import com.example.Project4.repository.VolunteerOpportunityRepository;
@@ -41,6 +38,14 @@ public class ApplicationService {
     public GenericDao<Application> createApplication(Application application) {
         GenericDao<Application> returnDao = new GenericDao<>();
         List<String> errors = new ArrayList<>();
+
+        // Check if the user is an admin
+        if (!isVolunteer()) {
+            errors.add("Only Volunteers can Apply");
+            returnDao.setErrors(errors); // Return immediately with the error
+            return returnDao;
+        }
+
 
         // Log the incoming application object
         System.out.println("Creating application with user ID: " + application.getUser().getId());
@@ -107,6 +112,14 @@ public class ApplicationService {
     public GenericDao<Application> updateApplication(Integer id, Application applicationDetails) {
         GenericDao<Application> returnDao = new GenericDao<>();
         List<String> errors = new ArrayList<>();
+
+        // Check if the user is an admin
+        if (!isVolunteer()) {
+            errors.add("Only Volunteers can Apply");
+            returnDao.setErrors(errors); // Return immediately with the error
+            return returnDao;
+        }
+
 
         Optional<Application> optionalApplication = applicationRepository.findById(id);
         if (optionalApplication.isEmpty()) {
