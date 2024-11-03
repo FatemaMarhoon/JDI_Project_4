@@ -342,7 +342,7 @@ public class UserService {
                     return ResponseEntity.status(403).body(new LoginResponse("Account is not verified. Please check your email for the verification link."));
                 } else if (!spUser.getStatus()) {
                     return ResponseEntity.status(403).body(new LoginResponse("Account is deactivated. Please contact support."));
-                } else if (!"APPROVED".equalsIgnoreCase(String.valueOf(spUser.getOrganization().getStatus()))) {
+                } else if (spUser.isOrganization()&&!"APPROVED".equalsIgnoreCase(String.valueOf(spUser.getOrganization().getStatus()))) {
                     return ResponseEntity.status(403).body(new LoginResponse("Organization is still in review. Please contact support."));
                 }
                 else {
