@@ -55,6 +55,12 @@ The backend will be structured in compliance with the **MVC** architecture, ensu
 ![Untitled-6](https://github.com/user-attachments/assets/a13b8347-31e5-4573-8920-6f070f80fafd)
 
 
+##Endpoints
+| Request Type | URL                | Functionality      | Access  | 
+|--------------|--------------------|--------------------|---------|
+| POST         | /auth/users/login/ | User login         | Public  |
+| GET          | /api/organizations/   | Get all organizations | Public |
+
 ## Installation Instructions
 
 1. Clone the repository:
