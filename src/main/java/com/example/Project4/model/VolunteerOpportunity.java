@@ -39,4 +39,7 @@ public class VolunteerOpportunity {
     @JoinColumn(name = "organizationId", nullable = false)
     private Organization organization;
 
+    @Column(name = "is_archived")
+    private boolean isArchived = false; // Default to not archived
+
 }

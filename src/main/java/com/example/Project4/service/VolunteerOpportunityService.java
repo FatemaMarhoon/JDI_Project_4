@@ -6,8 +6,10 @@ import com.example.Project4.model.Role;
 import com.example.Project4.model.VolunteerOpportunity;
 import com.example.Project4.repository.VolunteerOpportunityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -77,6 +79,13 @@ public class VolunteerOpportunityService {
     private boolean isOrganization() {
         Role currentRole = userService.getCurrentUserRole();
         return currentRole != null && currentRole.getName().equals("Organization"); // Adjust based on your Role enum
+    }
+
+    public VolunteerOpportunity archiveOpportunity(Long id) {
+        return volunteerOpportunityRepository.findById(id).map(opportunity -> {
+            opportunity.setArchived(true);
+            return volunteerOpportunityRepository.save(opportunity);
+        }).orElseThrow(() -> new RuntimeException("Opportunity not found with id " + id));
     }
 
 }
