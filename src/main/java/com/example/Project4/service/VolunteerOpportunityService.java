@@ -99,6 +99,11 @@ public class VolunteerOpportunityService {
         volunteerOpportunityRepository.saveAll(expiredOpportunities);
     }
 
+    @Scheduled(cron = "0 0 0 * * ?") // Runs at midnight every day
+    public void archiveExpiredOpportunitiesDaily() {
+        archiveExpiredOpportunities();
+    }
+
 
 
 
