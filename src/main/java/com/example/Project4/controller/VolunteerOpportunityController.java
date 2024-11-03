@@ -1,5 +1,6 @@
 package com.example.Project4.controller;
 
+import com.example.Project4.dao.GenericDao;
 import com.example.Project4.model.VolunteerOpportunity;
 import com.example.Project4.service.VolunteerOpportunityService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ public class VolunteerOpportunityController {
     }
 
     @PostMapping
-    public VolunteerOpportunity createOpportunity(@RequestBody VolunteerOpportunity opportunity) {
+    public GenericDao<VolunteerOpportunity> createOpportunity(@RequestBody VolunteerOpportunity opportunity) {
         return volunteerOpportunityService.createOpportunity(opportunity);
     }
 
