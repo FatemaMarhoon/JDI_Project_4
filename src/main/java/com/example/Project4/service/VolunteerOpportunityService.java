@@ -88,4 +88,19 @@ public class VolunteerOpportunityService {
         }).orElseThrow(() -> new RuntimeException("Opportunity not found with id " + id));
     }
 
+    public void archiveExpiredOpportunities() {
+        List<VolunteerOpportunity> expiredOpportunities = volunteerOpportunityRepository
+                .findByEndDateBeforeAndIsArchivedFalse(LocalDate.now());
+
+        for (VolunteerOpportunity opportunity : expiredOpportunities) {
+            opportunity.setArchived(true);
+        }
+
+        volunteerOpportunityRepository.saveAll(expiredOpportunities);
+    }
+
+
+
+
+
 }
