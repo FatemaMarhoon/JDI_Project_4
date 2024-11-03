@@ -324,12 +324,12 @@ public class UserService {
     }
 
     public ResponseEntity<?> loginUser(LoginRequest loginRequest) {
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken
-                (loginRequest.getEmail(), loginRequest.getPassword());
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                loginRequest.getEmail(), loginRequest.getPassword());
         try {
             Authentication authentication = authenticationManager.authenticate(authenticationToken);
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            myUserDetails = (MyUserDetails) authentication.getPrincipal();
+            MyUserDetails myUserDetails = (MyUserDetails) authentication.getPrincipal();
 
             // Retrieve the user from the database
             Optional<User> user = userRepository.findUserByEmail(loginRequest.getEmail());
@@ -337,22 +337,27 @@ public class UserService {
             // Check if the user is enabled and the account is not deactivated
             if (user.isPresent()) {
                 User spUser = user.get();
+
                 if (!spUser.isEnabled()) {
                     return ResponseEntity.status(403).body(new LoginResponse("Account is not verified. Please check your email for the verification link."));
                 } else if (!spUser.getStatus()) {
                     return ResponseEntity.status(403).body(new LoginResponse("Account is deactivated. Please contact support."));
-                } else {
+                } else if (!"APPROVED".equalsIgnoreCase(String.valueOf(spUser.getOrganization().getStatus()))) {
+                    return ResponseEntity.status(403).body(new LoginResponse("Organization is still in review. Please contact support."));
+                }
+                else {
                     final String jwt = jwTutils.generateJwtToken(myUserDetails);
                     return ResponseEntity.ok(new LoginResponse(jwt));
                 }
             } else {
-                // User is not enabled
+                // User not found
                 return ResponseEntity.status(403).body(new LoginResponse("Account is not verified. Please check your email for the verification link."));
             }
         } catch (Exception e) {
             return ResponseEntity.status(401).body(new LoginResponse("Error! Username or Password is incorrect"));
         }
     }
+
 
     public static User getCurrentLoggedInUser() {
         MyUserDetails userDetails = (MyUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
