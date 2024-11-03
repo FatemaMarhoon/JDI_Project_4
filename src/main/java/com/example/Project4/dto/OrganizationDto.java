@@ -3,6 +3,7 @@ package com.example.Project4.dto;
 import com.example.Project4.enums.Status;
 import com.example.Project4.model.Organization;
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -16,6 +17,7 @@ import java.io.Serializable;
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class OrganizationDto implements Serializable {
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Integer id;
     private String name;
     private String contactInfo;
@@ -28,7 +30,7 @@ public class OrganizationDto implements Serializable {
         this.name = organization.getName();
         this.contactInfo = organization.getContactInfo();
         this.description = organization.getDescription();
-        this.status = organization.getStatus() == Status.PENDING;
+     //   this.status = organization.getStatus() == Status.PENDING;
         this.user = organization.getUser() != null ? new UserDto(organization.getUser(), false) : null;
     }
 

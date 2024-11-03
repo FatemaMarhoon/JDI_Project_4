@@ -19,12 +19,14 @@ import java.time.LocalDateTime;
 @Getter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDto implements Serializable {
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Long id;
     private String email;
     private String firstName;
     private String lastName;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Boolean status;
     @JsonIgnore
     private String verificationCode;
@@ -37,7 +39,10 @@ public class UserDto implements Serializable {
     private RoleDto role;
     private ProfileDto profile;
     private OrganizationDto organizationDto;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private boolean isOrganization;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+
     private boolean isVolunteer;
 
     public UserDto(User user, boolean details) {
