@@ -1,18 +1,21 @@
 package com.example.Project4.service;
 
 import com.example.Project4.dao.GenericDao;
-import com.example.Project4.model.Application;
+import com.example.Project4.model.File;
 import com.example.Project4.model.Role;
 import com.example.Project4.model.VolunteerOpportunity;
 import com.example.Project4.repository.VolunteerOpportunityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class VolunteerOpportunityService {
@@ -20,10 +23,12 @@ public class VolunteerOpportunityService {
     private final VolunteerOpportunityRepository volunteerOpportunityRepository;
     private final UserService userService; // Declare UserService
 
+    private final S3Service s3Service;
     @Autowired
-    public VolunteerOpportunityService(VolunteerOpportunityRepository volunteerOpportunityRepository, UserService userService) {
+    public VolunteerOpportunityService(VolunteerOpportunityRepository volunteerOpportunityRepository, UserService userService,S3Service s3Service) {
         this.volunteerOpportunityRepository = volunteerOpportunityRepository;
         this.userService = userService;
+        this.s3Service=s3Service;
     }
 
     public List<VolunteerOpportunity> getAllOpportunities() {
@@ -40,7 +45,7 @@ public class VolunteerOpportunityService {
 
         // Check if the user is an admin
         if (!isOrganization()) {
-            errors.add("Only Volunteers can Apply");
+            errors.add("Only Orgs can add");
             returnDao.setErrors(errors); // Return immediately with the error
             return returnDao;
         }
@@ -104,6 +109,48 @@ public class VolunteerOpportunityService {
         archiveExpiredOpportunities();
     }
 
+    public CompletableFuture<GenericDao<VolunteerOpportunity>> createOpportunityWithFiles(
+            VolunteerOpportunity opportunity, List<MultipartFile> files) throws IOException {
+
+        GenericDao<VolunteerOpportunity> returnDao = new GenericDao<>();
+        List<String> errors = new ArrayList<>();
+
+        if (!isOrganization()) {
+            errors.add("Only Organizations can create opportunities");
+            returnDao.setErrors(errors);
+            return CompletableFuture.completedFuture(returnDao);
+        }
+
+        List<CompletableFuture<File>> uploadedFiles = new ArrayList<>();
+        for (MultipartFile file : files) {
+            uploadedFiles.add(uploadFileToS3(file, opportunity));  // Pass opportunity to method
+        }
+
+        return CompletableFuture.allOf(uploadedFiles.toArray(new CompletableFuture[0]))
+                .thenApply(v -> {
+                    List<File> savedFiles = uploadedFiles.stream().map(CompletableFuture::join).toList();
+                    opportunity.setFiles(savedFiles);
+                    VolunteerOpportunity savedOpportunity = volunteerOpportunityRepository.save(opportunity);
+                    returnDao.setObject(savedOpportunity);
+                    return returnDao;
+                }).exceptionally(e -> {
+                    errors.add("Error saving opportunity: " + e.getMessage());
+                    returnDao.setErrors(errors);
+                    return returnDao;
+                });
+    }
+
+    private CompletableFuture<File> uploadFileToS3(MultipartFile file, VolunteerOpportunity opportunity) throws IOException {
+        String contentType = file.getContentType();
+        String fileName = file.getOriginalFilename();
+
+        return s3Service.uploadFile(file.getBytes(), fileName, contentType)
+                .thenApply(url -> {
+                    File savedFile = new File(fileName, url);
+                    savedFile.setVolunteerOpportunity(opportunity);  // Set the opportunity here
+                    return savedFile;
+                });
+    }
 
 
 
