@@ -510,4 +510,15 @@ public class UserService {
         return null; // No user is authenticated
     }
 
+    public Organization getCurrentUserOrg() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.getPrincipal() instanceof MyUserDetails) {
+            MyUserDetails userDetails = (MyUserDetails) authentication.getPrincipal();
+            User currentUser = userDetails.getUser();
+            return currentUser.getOrganization().getUser().getOrganization();
+        }
+
+        return null; // No user is authenticated
+    }
 }
