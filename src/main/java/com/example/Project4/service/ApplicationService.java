@@ -172,7 +172,7 @@ public class ApplicationService {
             errors.add("Application not found");
         } else {
             Application application = optionalApplication.get();
-            if (!application.getStatus().equals("Pending")) {
+            if (!application.getStatus().equals(Status.PENDING)) {
                 errors.add("Only pending applications can be approved");
             } else {
                 application.setStatus(Status.APPROVED);
