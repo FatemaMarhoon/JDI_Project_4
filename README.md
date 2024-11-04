@@ -1,5 +1,5 @@
 
-# Volunteer Matching Platform
+# VolunteerConnect
 
 ## Overview
 
