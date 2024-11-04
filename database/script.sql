@@ -27,3 +27,8 @@ CREATE DATABASE "Project4"
         name character varying(255) COLLATE pg_catalog."default" NOT NULL,
         CONSTRAINT role_pkey PRIMARY KEY (role_id)
     )
+
+INSERT INTO role (role_id, description, name) VALUES
+(1, 'Administrator with full privileges', 'Admin'),
+(2, 'Standard user with limited privileges', 'Volunteer'),
+(3, 'Organization account with privileges to manage opportunities', 'Organization');
