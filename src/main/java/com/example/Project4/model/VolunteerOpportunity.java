@@ -35,7 +35,8 @@ public class VolunteerOpportunity {
     @OneToMany(mappedBy = "volunteerOpportunity", cascade = CascadeType.ALL)
     private List<File> files; // List of uploaded files
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
+
     @JoinColumn(name = "organizationId", nullable = false)
     private Organization organization;
 
