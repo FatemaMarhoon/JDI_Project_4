@@ -1,27 +1,31 @@
 package com.example.Project4.model;
 
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
-@Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
-@Setter
 @Getter
+@Setter
+@ToString
+@Entity
 public class File {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer fileId;
+    private Long id;
 
-    private String filePath;
+    private String fileName;
+    private String fileUrl;
 
-    @ManyToOne
-    @JoinColumn(name = "opportunityId", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "opportunity_id", nullable = false)
+    @JsonIgnore
     private VolunteerOpportunity volunteerOpportunity;
 
+    public File(String fileName, String url) {
+        this.fileName=fileName;
+        this.fileUrl=url;
+    }
 }
