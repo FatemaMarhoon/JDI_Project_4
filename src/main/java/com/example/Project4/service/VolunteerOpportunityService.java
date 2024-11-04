@@ -130,6 +130,9 @@ public class VolunteerOpportunityService {
                 .thenApply(v -> {
                     List<File> savedFiles = uploadedFiles.stream().map(CompletableFuture::join).toList();
                     opportunity.setFiles(savedFiles);
+//                    System.out.println("currrent user:"+userService.getCurrentUser());
+                    System.out.println("current org"+userService.getCurrentUserOrg());
+//                    opportunity.setOrganization(userService.getCurrentUserOrg());
                     VolunteerOpportunity savedOpportunity = volunteerOpportunityRepository.save(opportunity);
                     returnDao.setObject(savedOpportunity);
                     return returnDao;
