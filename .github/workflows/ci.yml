@@ -3,10 +3,10 @@ name: CI
 on:
   push:
     branches:
-      - main
+      - main  # or your main branch name
   pull_request:
     branches:
-      - main
+      - main  # or your main branch name
 
 jobs:
   build:
@@ -20,10 +20,6 @@ jobs:
           POSTGRES_PASSWORD: nE5kMc7JCGNqwDQM
         ports:
           - 5432:5432
-        volumes:
-          - postgres:/var/lib/postgresql/data
-        networks:
-          - postgres
 
     steps:
       - name: Checkout code
@@ -40,10 +36,3 @@ jobs:
 
       - name: Clean up
         run: docker-compose down
-
-networks:
-  postgres:
-    driver: bridge
-
-volumes:
-  postgres:
