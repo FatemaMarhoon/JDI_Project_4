@@ -2,6 +2,7 @@ package com.example.Project4.service;
 
 import com.example.Project4.dao.GenericDao;
 import com.example.Project4.model.File;
+import com.example.Project4.model.Organization;
 import com.example.Project4.model.Role;
 import com.example.Project4.model.VolunteerOpportunity;
 import com.example.Project4.repository.VolunteerOpportunityRepository;
@@ -155,6 +156,17 @@ public class VolunteerOpportunityService {
                 });
     }
 
+    public List<VolunteerOpportunity> getOpportunitiesForCurrentOrganization() {
+        // Get the current organization from the UserService
+        Organization currentOrg = userService.getCurrentUserOrg(); // Adjust this method to return the current organization
+
+        if (currentOrg == null) {
+            throw new RuntimeException("No organization found for the current user");
+        }
+
+        // Return opportunities for the current organization
+        return volunteerOpportunityRepository.findByOrganization(currentOrg); // You'll need to implement this method in the repository
+    }
 
 
 

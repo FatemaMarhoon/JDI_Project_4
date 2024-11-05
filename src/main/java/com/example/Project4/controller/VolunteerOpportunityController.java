@@ -89,5 +89,15 @@ public class VolunteerOpportunityController {
         return volunteerOpportunityService.createOpportunityWithFiles(opportunity, List.of(files));
     }
 
+    @GetMapping("/current-org")
+    public ResponseEntity<List<VolunteerOpportunity>> getOpportunitiesForCurrentOrganization() {
+        try {
+            List<VolunteerOpportunity> opportunities = volunteerOpportunityService.getOpportunitiesForCurrentOrganization();
+            return ResponseEntity.ok(opportunities);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
 
 }
