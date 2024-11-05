@@ -25,6 +25,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Set up JDK
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'adopt'
+
+      - name: Build the JAR
+        run: mvn package -Dmaven.test.skip=true  # or mvn package -DskipTests=true
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
