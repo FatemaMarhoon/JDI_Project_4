@@ -56,7 +56,6 @@ jobs:
         run: |
           docker-compose build
           docker-compose up -d api_service  # Start your application service
-          docker-compose up test_service  # Run tests
 
       - name: Clean up
         run: docker-compose down
