@@ -1,5 +1,6 @@
 package com.example.Project4.controller;
 
+import com.example.Project4.dao.GenericDao;
 import com.example.Project4.model.Follow;
 import com.example.Project4.model.Organization;
 import com.example.Project4.model.User;
@@ -30,14 +31,18 @@ public class FollowController {
     }
 
     @PostMapping
-    public ResponseEntity<Follow> createFollow(@RequestBody Follow follow) {
-        try {
-            Follow createdFollow = followService.createFollow(follow);
-            return ResponseEntity.ok(createdFollow);
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(null); // handle duplicate follow case
+    public ResponseEntity<GenericDao<Follow>> createFollow(@RequestBody Follow follow) {
+        GenericDao<Follow> result = followService.createFollow(follow);
+
+        if (!result.getErrors().isEmpty()) {
+            // Return a bad request response if there are errors
+            return ResponseEntity.badRequest().body(result);
+        } else {
+            // Return an OK response with the created follow if no errors
+            return ResponseEntity.ok(result);
         }
     }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteFollow(@PathVariable Integer id) {

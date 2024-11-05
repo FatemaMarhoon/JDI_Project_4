@@ -1,13 +1,17 @@
 package com.example.Project4.service;
 
+import com.example.Project4.dao.GenericDao;
+import com.example.Project4.model.Application;
 import com.example.Project4.model.Follow;
 import com.example.Project4.model.Organization;
 import com.example.Project4.model.User;
 import com.example.Project4.repository.FollowRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,16 +45,31 @@ public class FollowService {
         return followRepository.findByFollowedOrganization(organization);
     }
 
-    public Follow createFollow(Follow follow) {
-        // Check if the user is already following the organization
-        boolean exists = followRepository.existsByFollowerAndFollowedOrganization(follow.getFollower(), follow.getFollowedOrganization());
-        if (exists) {
-            throw new RuntimeException("User is already following this organization.");
-        }
+    @Transactional
+    public GenericDao<Follow> createFollow(Follow follow) {
+        GenericDao<Follow> returnDao = new GenericDao<>();
+        List<String> errors = new ArrayList<>();
+
         follow.setFollower(userService.getCurrentUser());
-        follow.setFollowedAt(LocalDateTime.now());
-        return followRepository.save(follow);
+
+        boolean exists = followRepository.existsByFollowerAndFollowedOrganization(
+                follow.getFollower(), follow.getFollowedOrganization());
+
+        if (exists) {
+            errors.add("User is already following this organization.");
+        } else {
+            follow.setFollowedAt(LocalDateTime.now());
+            Follow savedFollow = followRepository.save(follow);
+            returnDao.setObject(savedFollow);
+        }
+
+        if (!errors.isEmpty()) {
+            returnDao.setErrors(errors);
+        }
+
+        return returnDao;
     }
+
 
 
 
