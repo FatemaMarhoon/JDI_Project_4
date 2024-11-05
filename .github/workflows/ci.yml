@@ -32,7 +32,7 @@ jobs:
           distribution: 'adopt'
 
       - name: Build the JAR
-        run: mvn package -Dmaven.test.skip=true  # or mvn package -DskipTests=true
+        run: mvn package -Dmaven.test.skip=true
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
