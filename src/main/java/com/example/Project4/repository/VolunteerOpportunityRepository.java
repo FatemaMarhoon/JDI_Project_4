@@ -1,5 +1,6 @@
 package com.example.Project4.repository;
 
+import com.example.Project4.model.Organization;
 import com.example.Project4.model.VolunteerOpportunity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -11,5 +12,6 @@ import java.util.List;
 public interface VolunteerOpportunityRepository extends JpaRepository<VolunteerOpportunity, Long> {
     List<VolunteerOpportunity> findByTitleContainingIgnoreCase(String title);
     List<VolunteerOpportunity> findByEndDateBeforeAndIsArchivedFalse(LocalDate date);
+    List<VolunteerOpportunity> findByOrganization(Organization organization);
 
 }
