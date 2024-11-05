@@ -190,6 +190,11 @@ public class OrganizationService {
     }
 
     public List<Organization> searchOrgByName(String name) {
-        return organizationRepository.findByNameContainingIgnoreCase(name);
+        List<Organization> allMatchingOrganizations = organizationRepository.findByNameContainingIgnoreCase(name);
+        // Filter to keep only approved organizations
+        return allMatchingOrganizations.stream()
+                .filter(org -> org.getStatus() == Status.APPROVED)
+                .toList();
     }
+
 }
