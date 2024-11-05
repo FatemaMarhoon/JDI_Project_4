@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres_db:
+        image: postgres:11.4
+        env:
+          POSTGRES_DB: java_to_dev_app_db
+          POSTGRES_PASSWORD: nE5kMc7JCGNqwDQM
+        ports:
+          - 5432:5432
+        volumes:
+          - postgres:/var/lib/postgresql/data
+        networks:
+          - postgres
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build and Run Tests
+        run: |
+          docker-compose build
+          docker-compose up -d api_service  # Start your application service
+          docker-compose up test_service  # Run tests
+
+      - name: Clean up
+        run: docker-compose down
+
+networks:
+  postgres:
+    driver: bridge
+
+volumes:
+  postgres:
