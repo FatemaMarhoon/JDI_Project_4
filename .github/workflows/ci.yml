@@ -42,6 +42,16 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y docker-compose
 
+      - name: Remove existing Docker containers
+        run: |
+          docker ps -aq | xargs docker rm -f || true
+
+      - name: Start PostgreSQL service with retries
+        run: |
+          for i in {1..5}; do
+            docker-compose up -d postgres_db && break || sleep 5
+          done
+
       - name: Build and Run Tests
         run: |
           docker-compose build
