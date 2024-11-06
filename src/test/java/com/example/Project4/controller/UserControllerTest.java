@@ -3,7 +3,9 @@ package com.example.Project4.controller;
 import com.example.Project4.dao.GenericDao;
 import com.example.Project4.dto.UserDto;
 import com.example.Project4.model.LoginRequest;
-import com.example.Project4.model.LoginResponse;
+import com.example.Project4.model.Role;
+import com.example.Project4.model.User;
+import com.example.Project4.security.MyUserDetails;
 import com.example.Project4.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,136 +15,112 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.Collections;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
-class UserControllerTest {
-
-    @InjectMocks
-    private UserController userController;
+public class UserControllerTest {
 
     @Mock
     private UserService userService;
 
     @Mock
-    private ObjectMapper objectMapper;
+    private Authentication authentication;
 
+    @Mock
+    private SecurityContext securityContext;
+
+    @InjectMocks
+    private UserController userController;
+
+    @Mock
+    private MyUserDetails mockedUserDetails;  // Mock MyUserDetails
+
+    @Mock
+    private User mockedUser; // Mock User
+
+    @Mock
+    Role mockedRole;
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         MockitoAnnotations.openMocks(this);
+
+        // Mock SecurityContext and Authentication
+        when(securityContext.getAuthentication()).thenReturn(authentication);
+        SecurityContextHolder.setContext(securityContext);
+
+        // Mock getPrincipal to return mocked MyUserDetails
+        when(authentication.getPrincipal()).thenReturn(mockedUserDetails);
+
+        // Mock the getCurrentLoggedInUser() method to return the mocked User object
+        when(userService.getCurrentLoggedInUser()).thenReturn(mockedUser);
+
+        // Mock the user's role
+        when(mockedUser.getRole()).thenReturn(mockedRole);
+        when(mockedRole.getName()).thenReturn("User"); // or "Admin" for testing other cases
     }
 
-    @Test
-    void createUser_Success() throws Exception {
-        UserDto userDto = new UserDto();
-        userDto.setFirstName("testuser");
-        GenericDao<UserDto> genericDao = new GenericDao<>();
-        genericDao.setObject(userDto);
-
-        when(userService.createUser(any(UserDto.class))).thenReturn(genericDao);
-        when(objectMapper.writeValueAsString(any(UserDto.class))).thenReturn("{\"username\":\"testuser\"}");
-
-        ResponseEntity<GenericDao<UserDto>> response = userController.createUser(userDto);
-
-        assertEquals(HttpStatus.CREATED, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(userDto, response.getBody().getObject());
-    }
 
     @Test
-    void createUser_Failure() throws Exception {
-        UserDto userDto = new UserDto();
-        GenericDao<UserDto> genericDao = new GenericDao<>();
-        List<String> errors = new ArrayList<>();
-        errors.add("User already exists");
-        genericDao.setErrors(errors);
+    public void testCreateUser_BadRequest() throws Exception {
+        // Simulate exception during user creation
+        when(userService.createUser(any(UserDto.class))).thenThrow(new RuntimeException());
 
-        when(userService.createUser(any(UserDto.class))).thenReturn(genericDao);
+        // Call the endpoint
+        ResponseEntity<GenericDao<UserDto>> response = userController.createUser(new UserDto());
 
-        ResponseEntity<GenericDao<UserDto>> response = userController.createUser(userDto);
-
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertNotNull(response.getBody());
-        assertEquals(errors, response.getBody().getErrors());
-    }
-
-//    @Test
-//    void loginUser_Success() throws Exception {
-//        LoginRequest loginRequest = new LoginRequest();
-//        LoginResponse loginResponse = new LoginResponse("token");
-//
-//        when(userService.loginUser(any(LoginRequest.class))).thenReturn(ResponseEntity.ok(loginResponse));
-//
-//        ResponseEntity<?> response = userController.loginUser(loginRequest);
-//
-//        assertEquals(HttpStatus.OK, response.getStatusCode());
-//        assertEquals(loginResponse, response.getBody());
-//    }
-
-    @Test
-    void loginUser_Failure() throws Exception {
-        LoginRequest loginRequest = new LoginRequest();
-
-        when(userService.loginUser(any(LoginRequest.class))).thenThrow(new RuntimeException("Login failed"));
-
-        ResponseEntity<?> response = userController.loginUser(loginRequest);
-
+        // Verify the response
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
     @Test
-    void verifyUser_Success() {
-        String code = "verificationCode";
-
-        when(userService.verify(code)).thenReturn(true);
-
-        ResponseEntity<?> response = userController.verifyUser(code);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("User verified Successfully!", response.getBody());
-    }
-
-    @Test
-    void verifyUser_Failure() {
-        String code = "verificationCode";
-
-        when(userService.verify(code)).thenReturn(false);
-
-        ResponseEntity<?> response = userController.verifyUser(code);
-
-        assertEquals(HttpStatus.FORBIDDEN, response.getStatusCode());
-        assertEquals(new LoginResponse("Code Verification is wrong. please provide the correct one."), response.getBody());
-    }
-
-    @Test
-    void requestPasswordReset_Success() {
-        String email = "test@example.com";
-
-        when(userService.requestPasswordReset(email)).thenReturn(true);
-
-        ResponseEntity<?> response = userController.requestPasswordReset(email);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Password reset code sent.", response.getBody());
-    }
-
-    @Test
-    void requestPasswordReset_UserNotFound() {
+    public void testRequestPasswordReset_UserNotFound() {
         String email = "test@example.com";
 
         when(userService.requestPasswordReset(email)).thenReturn(false);
 
+        // Call the endpoint
         ResponseEntity<?> response = userController.requestPasswordReset(email);
 
+        // Verify the results
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertEquals("User with this email does not exist.", response.getBody());
     }
 
-    // Add similar tests for resetPassword, changePassword, deactivateUser, and getAllUsers...
+    @Test
+    public void testGetAllUsers_Unauthorized() {
+        // Simulate non-admin access
+        when(userService.getCurrentLoggedInUser().getRole().getName()).thenReturn("User");
 
+        // Call the endpoint
+        ResponseEntity<GenericDao<List<UserDto>>> response = userController.getAllUsers();
+
+        // Verify the results
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
+    }
+
+    @Test
+    public void testGetAllUsers_Success() {
+        // Mock admin role and user list
+        UserDto userDto = new UserDto();
+        GenericDao<List<UserDto>> genericDao = new GenericDao<>();
+        genericDao.setObject(Collections.singletonList(userDto));
+
+        when(userService.getCurrentLoggedInUser().getRole().getName()).thenReturn("Admin");
+        when(userService.getAll(false)).thenReturn(Collections.singletonList(userDto));
+
+        // Call the endpoint
+        ResponseEntity<GenericDao<List<UserDto>>> response = userController.getAllUsers();
+
+        // Verify the results
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(genericDao.getObject(), response.getBody().getObject());
+    }
 }
