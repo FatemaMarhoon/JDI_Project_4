@@ -55,11 +55,50 @@ The backend will be structured in compliance with the **MVC** architecture, ensu
 ![Untitled-6](https://github.com/user-attachments/assets/a13b8347-31e5-4573-8920-6f070f80fafd)
 
 
-##Endpoints
-| Request Type | URL                | Functionality      | Access  | 
-|--------------|--------------------|--------------------|---------|
-| POST         | /auth/users/login/ | User login         | Public  |
-| GET          | /api/organizations/   | Get all organizations | Public |
+| Request Type | URL                                         | Functionality                              | Access       | 
+|--------------|---------------------------------------------|--------------------------------------------|--------------|
+| POST         | /auth/users/login                           | User login                                 | Public       |
+| POST         | /auth/users/register                        | User registration                          | Public       |
+| POST         | /auth/users/verify                          | Verify user account                        | Public       |
+| POST         | /auth/users/request-password-reset          | Request password reset                     | Public       |
+| POST         | /auth/users/reset-password                  | Reset password with token                  | Public       |
+| POST         | /auth/users/change-password                 | Change password                            | Authenticated |
+| POST         | /auth/users/deactivate                      | Deactivate user                            | Admin        |
+| GET          | /auth/users                                 | Get all users                              | Admin        |
+| POST         | /api/organizations                          | Create a new organization                  | Public       |
+| GET          | /api/organizations/approved                 | Get all approved organizations             | Public       |
+| PUT          | /api/organizations/{id}/approve             | Approve an organization                    | Admin        |
+| PUT          | /api/organizations/{id}/reject              | Reject an organization                     | Admin        |
+| GET          | /api/organizations                          | Get all organizations                      | Public       |
+| GET          | /api/organizations/{id}                     | Get an organization by ID                  | Public       |
+| PUT          | /api/organizations/{id}                     | Update an organization                     | Public       |
+| DELETE       | /api/organizations/{id}                     | Delete an organization                     | Admin        |
+| GET          | /api/organizations/search                   | Search organizations by name               | Public       |
+| GET          | /api/opportunities                          | Get all volunteer opportunities            | Public       |
+| GET          | /api/opportunities/{id}                     | Get a volunteer opportunity by ID          | Public       |
+| PUT          | /api/opportunities/{id}                     | Update a volunteer opportunity             | Authenticated |
+| DELETE       | /api/opportunities/{id}                     | Delete a volunteer opportunity             | Authenticated |
+| GET          | /api/opportunities/search                   | Search volunteer opportunities by title    | Public       |
+| PUT          | /api/opportunities/{id}/archive             | Archive a volunteer opportunity            | Authenticated |
+| POST         | /api/opportunities                          | Create a new volunteer opportunity         | Authenticated |
+| POST         | /api/opportunities/consumes/multipart       | Create a new volunteer opportunity with files | Authenticated |
+| GET          | /api/opportunities/current-org              | Get opportunities for the current organization | Authenticated |
+| GET          | /api/applications                           | Get all applications                       | Admin        |
+| GET          | /api/applications/{id}                      | Get an application by ID                   | Authenticated |
+| POST         | /api/applications                           | Create a new application                   | Authenticated |
+| PUT          | /api/applications/{id}                      | Update an application                      | Authenticated |
+| DELETE       | /api/applications/{id}                      | Delete an application                      | Admin        |
+| GET          | /api/applications/user/{userId}             | Get applications by user                   | Authenticated |
+| GET          | /api/applications/opportunity/{opportunityId} | Get applications by opportunity           | Public       |
+| PUT          | /api/applications/{id}/approve              | Approve an application                     | Admin        |
+| PUT          | /api/applications/{id}/reject               | Reject an application                      | Admin        |
+| GET          | /api/follows                                | Get all follow records                     | Authenticated |
+| GET          | /api/follows/{id}                           | Get a follow record by ID                  | Authenticated |
+| POST         | /api/follows                                | Create a new follow                        | Authenticated |
+| DELETE       | /api/follows/{id}                           | Delete a follow                            | Authenticated |
+| GET          | /api/follows/follower/{followerId}          | Get follows by follower                    | Authenticated |
+| GET          | /api/follows/organization/{organizationId}  | Get follows by organization                | Authenticated |
+
 
 ## Installation Instructions
 
