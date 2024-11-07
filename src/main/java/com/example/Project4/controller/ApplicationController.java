@@ -57,14 +57,14 @@ public class ApplicationController {
     }
 
     @GetMapping("/user/{userId}")
-    public List<Application> getApplicationsByUser(@PathVariable Long userId) {
+    public GenericDao<List<Application>>getApplicationsByUser(@PathVariable Long userId) {
         User user = new User();  // Create a new User instance
         user.setId(userId);     // Set the ID
         return applicationService.getApplicationsByUser(user);
     }
 
     @GetMapping("/opportunity/{opportunityId}")
-    public List<Application> getApplicationsByOpportunity(@PathVariable Integer opportunityId) {
+    public GenericDao<List<Application>> getApplicationsByOpportunity(@PathVariable Integer opportunityId) {
         VolunteerOpportunity opportunity = new VolunteerOpportunity();  // Create a new Opportunity instance
         opportunity.setOpportunityId(opportunityId);  // Set the ID
         return applicationService.getApplicationsByOpportunity(opportunity);

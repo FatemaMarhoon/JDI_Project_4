@@ -12,4 +12,6 @@ import java.util.List;
 public interface ApplicationRepository extends JpaRepository<Application, Integer> {
     List<Application> findByUser(User user);
     List<Application> findByOpportunity(VolunteerOpportunity opportunity);
+    List<Application> findByOpportunity_Organization(User organization);
+
 }
