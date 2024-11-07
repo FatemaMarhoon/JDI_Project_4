@@ -32,3 +32,23 @@ INSERT INTO role (role_id, description, name) VALUES
 (1, 'Administrator with full privileges', 'Admin'),
 (2, 'Standard user with limited privileges', 'Volunteer'),
 (3, 'Organization account with privileges to manage opportunities', 'Organization');
+
+INSERT INTO user_profile (
+    profile_id, first_name, last_name, profile_pic
+) VALUES
+(1, 'Fatema', 'Marhoon', NULL),
+(2, 'Jane', 'Smith', NULL),
+(3, 'Jane', 'Smith', NULL);
+
+
+INSERT INTO users (
+    uid, email, is_enabled, first_name, is_organization, is_volunteer, last_name, password, reset_token, status, token_expiration_time, verification_code, profile_id, role_id
+) VALUES
+(1, 'ifatima.marhoon@gmail.com', TRUE, 'Fatema', FALSE, FALSE, 'Marhoon', '$2a$10$mRPGakgA6LLChWtkBhaiSuvgByBRrcPEWaB5ZcOVBzNGpTfcOCaBy', NULL, TRUE, NULL, NULL, 1, 1),
+(2, 'ifatima.marhoon+1@gmail.com', TRUE, 'Jane', TRUE, FALSE, 'Smith', '$2a$10$2Y4yxJjTlJRmYdnvzghcnuKHd27YYZErjDjYiBfKrXbL6onzCjYAO', NULL, TRUE, NULL, NULL, 2, 3),
+(3, 'ifatima.marhoon+2@gmail.com', TRUE, 'Jane', FALSE, TRUE, 'Smith', '$2a$10$NENfMskKeZdWYrj55n.ByuRIJRuSaE9Z4SwDW3GxREgiGN2zHxYd2', NULL, TRUE, NULL, NULL, 3, 2);
+
+INSERT INTO organization (
+    organization_id, contact_info, description, name, status, user_id
+) VALUES
+(1, '123-456-7890', 'A nonprofit organization focusing on community support', 'Helping Hands', 'APPROVED', 2);
