@@ -50,14 +50,17 @@ public class FollowService {
         GenericDao<Follow> returnDao = new GenericDao<>();
         List<String> errors = new ArrayList<>();
 
+        // Ensure the follower is the current logged-in user
         follow.setFollower(userService.getCurrentUser());
 
+        // Check if the user is already following the organization
         boolean exists = followRepository.existsByFollowerAndFollowedOrganization(
                 follow.getFollower(), follow.getFollowedOrganization());
 
         if (exists) {
             errors.add("User is already following this organization.");
         } else {
+            // Proceed to create the follow if no errors
             follow.setFollowedAt(LocalDateTime.now());
             Follow savedFollow = followRepository.save(follow);
             returnDao.setObject(savedFollow);
@@ -73,9 +76,17 @@ public class FollowService {
 
 
 
+
     public void deleteFollow(Integer id) {
         Follow follow = followRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Follow not found with id " + id));
+
+        // Ensure the current logged-in user is the follower
+        if (!follow.getFollower().equals(userService.getCurrentUser())) {
+            throw new RuntimeException("You can only delete your own follows");
+        }
+
         followRepository.delete(follow);
     }
+
 }
