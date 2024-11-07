@@ -5,6 +5,7 @@ import com.example.Project4.model.VolunteerOpportunity;
 import com.example.Project4.service.VolunteerOpportunityService;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -46,24 +47,33 @@ public class VolunteerOpportunityController {
 //    }
 
     @PutMapping("/{id}")
-    public ResponseEntity<VolunteerOpportunity> updateOpportunity(@PathVariable Long id, @RequestBody VolunteerOpportunity opportunityDetails) {
+    public ResponseEntity<?> updateOpportunity(@PathVariable Long id, @RequestBody VolunteerOpportunity opportunityDetails) {
         try {
             VolunteerOpportunity updatedOpportunity = volunteerOpportunityService.updateOpportunity(id, opportunityDetails);
             return ResponseEntity.ok(updatedOpportunity);
         } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+            // Return a 403 Forbidden status with an error message if it's an organization mismatch
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Error: " + e.getMessage());
+        } catch (Exception e) {
+            // Handle any other unexpected exceptions
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred: " + e.getMessage());
         }
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteOpportunity(@PathVariable Long id) {
+    public ResponseEntity<String> deleteOpportunity(@PathVariable Long id) {
         try {
             volunteerOpportunityService.deleteOpportunity(id);
             return ResponseEntity.noContent().build();
         } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+            // Return a 403 Forbidden status with an error message if there's an organization mismatch
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Error: " + e.getMessage());
+        } catch (Exception e) {
+            // Handle any other unexpected exceptions with a 500 Internal Server Error status
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred: " + e.getMessage());
         }
     }
+
 
     @GetMapping("/search")
     public List<VolunteerOpportunity> searchOpportunities(@RequestParam String title) {
@@ -71,14 +81,16 @@ public class VolunteerOpportunityController {
     }
 
     @PutMapping("/{id}/archive")
-    public ResponseEntity<VolunteerOpportunity> archiveOpportunity(@PathVariable Long id) {
+    public ResponseEntity<String> archiveOpportunity(@PathVariable Long id) {
         try {
             VolunteerOpportunity archivedOpportunity = volunteerOpportunityService.archiveOpportunity(id);
-            return ResponseEntity.ok(archivedOpportunity);
+            return ResponseEntity.ok("Opportunity archived successfully.");
         } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body("Error: " + e.getMessage());  // Return the error message from the exception
         }
     }
+
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public CompletableFuture<GenericDao<VolunteerOpportunity>> createOpportunityWithFiles(
