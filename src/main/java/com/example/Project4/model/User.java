@@ -73,6 +73,7 @@ public class User {
 
     @OneToOne(mappedBy = "user")
     @JsonIgnore
+    @ToString.Exclude
     private Organization organization;
 
     public User(UserDto dto) {
