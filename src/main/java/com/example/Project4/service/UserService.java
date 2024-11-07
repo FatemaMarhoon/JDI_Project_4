@@ -55,6 +55,7 @@ public class UserService {
     private MyUserDetails myUserDetails;
     private final JavaMailSender mailSender;
 
+    public User user;
     @Autowired
     public UserService(UserRepository userRepository,
                        ProfileRepository profileRepository,
@@ -504,11 +505,17 @@ public class UserService {
 
         if (authentication != null && authentication.getPrincipal() instanceof MyUserDetails) {
             MyUserDetails userDetails = (MyUserDetails) authentication.getPrincipal();
-            return userDetails.getUser();
+            User currentUser = userDetails.getUser();
+            this.user=currentUser;
+            return currentUser;
         }
+
+        // Logging for debugging purposes
+        System.out.println("Authentication is null or principal is not MyUserDetails");
 
         return null; // No user is authenticated
     }
+
 
     public Organization getCurrentUserOrg() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -518,6 +525,20 @@ public class UserService {
             User currentUser = userDetails.getUser();
             return currentUser.getOrganization().getUser().getOrganization();
         }
+
+        return null; // No user is authenticated
+    }
+    public Long getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.getPrincipal() instanceof MyUserDetails) {
+            MyUserDetails userDetails = (MyUserDetails) authentication.getPrincipal();
+            User currentUser = userDetails.getUser();
+            return currentUser.getId();
+        }
+
+        // Logging for debugging purposes
+        System.out.println("Authentication is null or principal is not MyUserDetails");
 
         return null; // No user is authenticated
     }
