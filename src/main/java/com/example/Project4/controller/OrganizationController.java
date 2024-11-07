@@ -5,9 +5,11 @@ import com.example.Project4.model.Organization;
 import com.example.Project4.model.VolunteerOpportunity;
 import com.example.Project4.service.OrganizationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -58,17 +60,31 @@ public class OrganizationController {
         return ResponseEntity.ok(returnDao); // Return rejected organization
     }
 
-    // Get all organizations
     @GetMapping
-    public ResponseEntity<List<Organization>> getAllOrganizations() {
-        List<Organization> organizations = organizationService.getAllOrganizations();
-        return ResponseEntity.ok(organizations);
+    public ResponseEntity<GenericDao<List<Organization>>> getAllOrganizations() {
+        GenericDao<List<Organization>> returnDao = new GenericDao<>();
+        List<String> errors = new ArrayList<>();
+
+        // Assuming organizationService.getAllOrganizations() returns a GenericDao containing a list of organizations
+        GenericDao<List<Organization>> daoResponse = organizationService.getAllOrganizations();
+
+        if (daoResponse != null && daoResponse.getObject() != null && !daoResponse.getObject().isEmpty()) {
+            // If organizations are found, return them
+            returnDao.setObject(daoResponse.getObject());
+            return ResponseEntity.ok(returnDao);
+        } else {
+            // If no organizations are found or there's an error
+            errors.add("No organizations found or access denied.");
+            returnDao.setErrors(errors);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(returnDao);
+        }
     }
+
 
     // Get an organization by ID
     @GetMapping("/{id}")
     public ResponseEntity<GenericDao<Organization>> getOrganizationById(@PathVariable("id") Integer organizationId) {
-        GenericDao<Organization> returnDao = organizationService.getOrganizationById(organizationId);
+        GenericDao<Organization> returnDao = organizationService.getOrganizationByIdDao(organizationId);
         if (!returnDao.getErrors().isEmpty()) {
             return ResponseEntity.badRequest().body(returnDao); // Return errors if present
         }

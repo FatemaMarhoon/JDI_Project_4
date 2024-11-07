@@ -2,12 +2,10 @@ package com.example.Project4.service;
 
 import com.example.Project4.dao.GenericDao;
 import com.example.Project4.model.Organization;
-import com.example.Project4.model.VolunteerOpportunity;
 import com.example.Project4.repository.OrganizationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.example.Project4.enums.Status;
-import com.example.Project4.service.UserService; // Import UserService
 import com.example.Project4.model.Role; // Import Role
 
 import java.util.ArrayList;
@@ -113,12 +111,25 @@ public class OrganizationService {
     }
 
     // Get all organizations
-    public List<Organization> getAllOrganizations() {
-        return organizationRepository.findAll();
+    public GenericDao<List<Organization>> getAllOrganizations() {
+        GenericDao<List<Organization>> returnDao = new GenericDao<>();
+        List<String> errors = new ArrayList<>();
+
+        if (isAdmin()) {
+            // If the current user is an admin, return all organizations
+            List<Organization> organizations = organizationRepository.findAll();
+            returnDao.setObject(organizations);
+        } else {
+            // If the current user is not an admin, return an error message
+            errors.add("Only admins can access all organizations.");
+            returnDao.setErrors(errors);
+        }
+
+        return returnDao;
     }
 
-    // Get an organization by ID
-    public GenericDao<Organization> getOrganizationById(Integer organizationId) {
+    // Get an organization by ID, returning a GenericDao
+    public GenericDao<Organization> getOrganizationByIdDao(Integer organizationId) {
         GenericDao<Organization> returnDao = new GenericDao<>();
         List<String> errors = new ArrayList<>();
 
@@ -127,14 +138,18 @@ public class OrganizationService {
             returnDao.setObject(organization.get());
         } else {
             errors.add("Organization not found");
-        }
-
-        if (!errors.isEmpty()) {
             returnDao.setErrors(errors);
         }
 
         return returnDao;
     }
+
+    // Get an organization by ID, returning only the Organization object
+    public Organization getOrganizationById(Integer organizationId) {
+        return organizationRepository.findById(organizationId)
+                .orElseThrow(() -> new RuntimeException("Organization not found with id " + organizationId));
+    }
+
 
     // Update an organization
     public GenericDao<Organization> updateOrganization(Integer organizationId, Organization organizationDetails) {
