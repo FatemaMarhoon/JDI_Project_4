@@ -13,7 +13,7 @@ import lombok.*;
 @Getter
 @Entity
 public class Organization {
-    @JsonIgnore
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer organizationId;
