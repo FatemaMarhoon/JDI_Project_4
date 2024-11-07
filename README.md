@@ -38,6 +38,7 @@ The **Volunteer Matching Platform** is a web-based system that connects voluntee
 - **JUnit, MockMvc** (for TDD)
 - **Lombok** (for simplifying Java code)
 - **Maven** (for dependency management)
+- **AWS** (for S3 upload)
 
 ## Development Approach
 
